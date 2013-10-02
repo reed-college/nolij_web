@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<folderobjects folderid="209" count="3">
+    <folderobject
+          docname="Image096550.tif"
+          displayname="Application for Withdrawal.tif"
+          datecreated="2010-01-05 13:39:58.0 EST"
+          filesize="877492"
+          documentid="96550"
+          filetype="tif"
+          pagecount="1"/>
+<folderobject
+          docname="Image096551.tif"
+          displayname="Change of Academic Program.tif"
+          datecreated="2010-01-05 13:39:58.0 EST"
+          filesize="9268980"
+          documentid="96551"
+          filetype="tif"
+          pagecount="2" />
+<folderobject
+          docname="Image096552.tif"
+          displayname="Change of Grade.tif"
+          datecreated="2010-01-05 13:39:59.0 EST"
+          filesize="2661944"
+          filetype="tif"
+          documentid="96552"
+          pagecount="1" />
+</folderobjects>

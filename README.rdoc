@@ -1,0 +1,55 @@
+= NolijWeb
+
+Talk to the Nolij Web API. The first version of this gem contains a small subset of available API methods. Document submission/printing(retrieval) are the main focus. Methods for folder listings, work flow request, and generated urls for the viewer are provided.
+
+The raw connection can be used to execute other types of request.
+
+== Installation
+
+Add this line to your application's Gemfile:
+
+    gem 'nolij_web'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install nolij_web
+
+== Basic Usage
+
+You should be able to use the handler for basic requests.
+  require 'nolij_web'
+
+  handler = NolijWeb::Handler.new(config_hash_or_path_to_config_yaml)
+
+  handler.folder_info({:folder_id => 1111111})
+
+Configuration can be passed as an assigned hash or read from a YAML file.
+  config = {
+            :username => 'username',
+            :password => 'password',
+            :base_url => 'https://somedomain.com/NolijWeb'
+           }
+
+== Using the Connection Directly
+
+You can use the handler's connection directly:
+  handler.connection.execute { "do some stuff"}
+
+This will open a connection, execute the block, and then close the connection returning the block
+
+You could also create a new connection without the handler
+  connection = Nolijweb::Connection.new(config)
+
+  connection.get('some_path')
+
+== Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
