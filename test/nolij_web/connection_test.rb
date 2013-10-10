@@ -239,6 +239,29 @@ with(:body => {"j_password"=> connection.instance_variable_get(:@password), "j_u
     end
   end
 
+  describe "#get_custom_connection" do
+    before do
+      setup_configured_connection
+      stub_connection_round_trip(@conn)
+      @stubbed_get = stub_request(:get, "#{@base_url}/go").to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)})
+    end
+
+    it "should not open connection" do
+      @conn.get_custom_connection('go')
+      assert_not_requested @stubbed_login
+    end
+
+    it "should get input path at base url with cookies" do
+      @conn.get_custom_connection('go')
+      assert_requested @stubbed_get
+    end
+
+    it "should not close connection" do
+      @conn.get_custom_connection('go')
+      assert_not_requested @stubbed_logout
+    end
+  end
+
   describe '#get' do
     before do
       setup_configured_connection
@@ -259,6 +282,76 @@ with(:body => {"j_password"=> connection.instance_variable_get(:@password), "j_u
     it "should close connection" do
       @conn.get('go', {})
       assert_requested @stubbed_logout
+    end
+  end
+
+  describe "#delete_custom_connection" do
+    before do
+      setup_configured_connection
+      stub_connection_round_trip(@conn)
+      @stubbed_get = stub_request(:delete, "#{@base_url}/go").to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)})
+    end
+
+    it "should not open connection" do
+      @conn.delete_custom_connection('go')
+      assert_not_requested @stubbed_login
+    end
+
+    it "should get input path at base url with cookies" do
+      @conn.delete_custom_connection('go')
+      assert_requested @stubbed_get
+    end
+
+    it "should not close connection" do
+      @conn.delete_custom_connection('go')
+      assert_not_requested @stubbed_logout
+    end
+  end
+
+  describe '#delete' do
+    before do
+      setup_configured_connection
+      stub_connection_round_trip(@conn)
+      @stubbed_get = stub_request(:delete, "#{@base_url}/go").to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)})
+    end
+
+    it "should open connection" do
+      @conn.delete('go')
+      assert_requested @stubbed_login
+    end
+
+    it "should get input path at base url with cookies" do
+      @conn.delete('go')
+      assert_requested @stubbed_get
+    end
+
+    it "should close connection" do
+      @conn.delete('go', {})
+      assert_requested @stubbed_logout
+    end
+  end
+
+  describe '#post_custom_connection' do
+    before do
+      setup_configured_connection
+      stub_connection_round_trip(@conn)
+      @post_params = {'a' => 'b'}
+      @stubbed_post = stub_request(:post, "#{@base_url}/go").with(:body => @post_params).to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)})
+    end
+
+    it "should not open connection" do
+      @conn.post_custom_connection('go', @post_params)
+      assert_not_requested @stubbed_login
+    end
+
+    it "should post to input path at base url with params and cookies" do
+      @conn.post_custom_connection('go', @post_params)
+      assert_requested @stubbed_post
+    end
+
+    it "should not close connection" do
+      @conn.post_custom_connection('go', @post_params)
+      assert_not_requested @stubbed_logout
     end
   end
 
@@ -293,22 +386,17 @@ with(:body => {"j_password"=> connection.instance_variable_get(:@password), "j_u
     end
 
     it "should establish connection" do
-      @conn.execute({}){ "something to do" }
+      @conn.execute { "something to do" }
       assert_requested @stubbed_login
     end
 
     it "should close connection when successful" do
-      @conn.execute({}){ "something to do" }
+      @conn.execute { "something to do" }
       assert_requested @stubbed_logout
     end
 
-    it "should close connection when error" do
-      @conn.execute({}){ raise 'hola' }
-      assert_requested @stubbed_login
-    end
-
     it "should yield the block" do
-      result = @conn.execute({}){ "something to do" }
+      result = @conn.execute { "something to do" }
       result.must_equal 'something to do'
     end
   end

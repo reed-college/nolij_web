@@ -1,7 +1,6 @@
 require_relative '../test_helper'
 
 describe NolijWeb::Handler do
-
   before do
     @base_url = 'http://example.reed.edu/NolijWeb'
     @handler = NolijWeb::Handler.new({:username => 'test_user', :password => 'test_password', :base_url => @base_url})
@@ -12,6 +11,10 @@ describe NolijWeb::Handler do
   end
 
   describe "initialize" do
+    it "should respond to connection" do
+      @handler.respond_to?(:connection)
+    end
+
     it "should set a connection" do
       @handler.instance_variable_get(:@connection).wont_be_nil
     end
@@ -66,7 +69,7 @@ describe NolijWeb::Handler do
 
     it "should raise missing attribute if folder id is supplied but no file" do
       err = lambda{@handler.submit_document(nil, {:folder_id => '234_324'})}.must_raise(NolijWeb::AttributeMissingError)
-      err.to_s.must_match /file is required/
+      err.to_s.must_match /path is required/
     end
 
     describe 'with valid folder and file path' do
@@ -93,6 +96,7 @@ describe NolijWeb::Handler do
   describe '#print_document' do
     before do
       @document_ids = ['12345', '54326']
+      @folder_id = '111_2'
       @stubbed_request = stub_request(:get, /\/handler\/api\/docs\/print/).to_return(:status => 200)
     end
 
@@ -102,7 +106,7 @@ describe NolijWeb::Handler do
     end
 
     it "should get print document" do
-      @handler.print_document(:document_ids => @document_ids)
+      @handler.print_document(:document_id => @document_ids)
       assert_requested @stubbed_request
     end
   end
@@ -130,32 +134,77 @@ describe NolijWeb::Handler do
     end
   end
 
+  describe '#login_check' do
+    it "should raise missing attribute if no redirect_to_path is supplied" do
+      err = lambda{@handler.login_check}.must_raise(NolijWeb::AttributeMissingError)
+      err.to_s.must_match /redirect path is required/i
+    end
+
+    it "should raise missing attribute if redirect_to_path is empty" do
+      err = lambda{@handler.login_check(:redir => '')}.must_raise(NolijWeb::AttributeMissingError)
+      err.to_s.must_match /redirect path is required/i
+    end
+
+    it "should return a full url if full url is true" do
+      @handler.login_check(:redir => '/document_path', :full_url => true).must_match /^#{@base_url}/
+    end
+
+    it "return a path if full url is empty" do
+      @handler.login_check(:redir => '/document_path').wont_match /^#{@base_url}/
+    end
+
+    it "return a path if full url is false" do
+      @handler.login_check(:redir => '/document_path', :full_url => false).wont_match /^#{@base_url}/
+    end
+
+    it "should return a string" do
+      @handler.login_check(:redir => '/document_path').must_be_kind_of(String)
+    end
+  end
+
   describe '#work_complete' do
     before do
       @folder_id = '12334'
       @folder_name = "Schmoe, Joe"
-      @wmfa_code = '12344'
+      @wfma_code = '12344'
     end
 
-    it "should raise missing attribute if no wmfa code supplied" do
+    it "should raise missing attribute if no wfma code supplied" do
       err = lambda{@handler.work_complete(:folder_name => @folder_name, :folder_id => @folder_id)}.must_raise(NolijWeb::AttributeMissingError)
       err.to_s.must_match /workflow master code is required/i
     end
 
     it "should raise missing attribute if no folder name supplied" do
-      err = lambda{@handler.work_complete(:wmfa_code => '1234', :folder_id => @folder_id)}.must_raise(NolijWeb::AttributeMissingError)
+      err = lambda{@handler.work_complete(:wfma_code => '1234', :folder_id => @folder_id)}.must_raise(NolijWeb::AttributeMissingError)
       err.to_s.must_match /folder name is required/i
     end
 
     it "should raise missing attribute if no folder id supplied" do
-      err = lambda{@handler.work_complete(:wmfa_code => '1234', :folder_name => @folder_name)}.must_raise(NolijWeb::AttributeMissingError)
+      err = lambda{@handler.work_complete(:wfma_code => '1234', :folder_name => @folder_name)}.must_raise(NolijWeb::AttributeMissingError)
       err.to_s.must_match /folder id is required/i
     end
 
     it "should post to work complete" do
-      stubbed_request = stub_request(:post, /\/handler\/api\/workflow\/workcomplete\/#{@folder_id}/).with(:query => hash_including({:wmfacode => @wmfa_code, :foldername => @folder_name.to_s})).to_return(:status => 200)
-      @handler.work_complete(:folder_id => @folder_id, :wmfa_code => @wmfa_code, :folder_name => @folder_name)
+      stubbed_request = stub_request(:post, /\/handler\/api\/workflow\/workcomplete\/#{@folder_id}/).with(:query => hash_including({:wfmacode => @wfma_code, :foldername => @folder_name.to_s})).to_return(:status => 200)
+      @handler.work_complete(:folder_id => @folder_id, :wfma_code => @wfma_code, :folder_name => @folder_name)
       assert_requested stubbed_request
     end
   end
+
+  describe "#version" do
+    before do
+      response = File.new(File.join(File.expand_path(File.dirname(__FILE__)), 'test_stubs', 'version_info.xml'))
+      @stubbed_request = stub_request(:get, /\/handler\/api\/version/).to_return(:status => 200, :body => response)
+    end
+
+    it "should get stubbed url" do
+      @handler.version
+      assert_requested @stubbed_request
+    end
+
+    it "should return an hash" do
+      @handler.version.must_be_kind_of(Hash)
+    end
+  end
+
 end
