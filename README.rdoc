@@ -1,6 +1,6 @@
 = NolijWeb
 
-Talk to the Nolij Web API. The first version of this gem contains a small subset of available API methods. Document submission/printing(retrieval) are the main focus. Methods for folder listings, work flow request, and generated urls for the viewer are provided.
+Talk to the Nolij Web API. This gem contains a subset of available API methods for the Nolij Web API. Document submission/printing(retrieval) are the main focus. Methods for folder listings, work flow request, and generated urls for the viewer are provided.
 
 The raw connection can be used to execute other types of requests.
 
@@ -20,26 +20,45 @@ Or install it yourself as:
 
 == Basic Usage
 
-You should be able to use the handler for basic requests.
+You should be able to use the handler for basic requests. Handler method options are based on the options from the Nolij Web API documentation. Underscores have been added to the option names.
+
   require 'nolij_web'
 
   handler = NolijWeb::Handler.new(config_hash_or_path_to_config_yaml)
 
-  handler.folder_info({:folder_id => 1111111})
+  handler.folder_info({:folder_id => '1111111'})
 
-Configuration can be passed as an assigned hash or read from a YAML file.
+=== Configuration
+Configuration can be passed as an assigned hash
   config = {
             :username => 'username',
             :password => 'password',
             :base_url => 'https://somedomain.com/NolijWeb'
            }
 
+Configuration can be read from a YAML file by passing the file path. The file should contain a hash structure:
+  ---
+  :username: 'username'
+  :password: 'password'
+  :base_url: 'https://somedomain.com/NolijWeb'
+
 == Passing a block to NolijWeb::Handler methods
 You may pass a custom block to handler methods. Please note that your block should return the response for successful request. Some of the methods rely on parsing XML responses from the server.
 
 == Using the Connection Directly
 
-You can use the handler's connection directly. See NolijWeb::Connection for info.
+You can use the handler's connection directly. An execute method has been provided to handle opening and closing of sessions. See NolijWeb::Connection for more info.
+  conn = NolijWeb::Connection.new(config_hash_or_path_to_config_yaml)
+  conn.execute() {
+    @folder_info = conn.get_custom_connection([conn.base_url, 'handler', 'api', 'docs', '1_1'].join('/'), conn.headers)
+    @doc_meta = conn.get_custom_connection([conn.base_url, 'handler', 'api', 'docs', '1_1', 123, 'documentmeta'].join('/'), conn.headers)
+  }
+
+You can also manually open and close connections if necessary:
+  conn = NolijWeb::Connection.new(config_hash_or_path_to_config_yaml)
+  conn.establish_connection
+    ... do some stuff with custom connection methods.
+  conn.close_connection
 
 == Contributing
 

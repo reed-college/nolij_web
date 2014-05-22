@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = NolijWeb::Version::VERSION
   spec.authors       = ["Shannon Henderson"]
   spec.email         = ["shenders@reed.edu"]
-  spec.description   = %q{A Ruby wrapper for the Nolijweb API}
+  spec.description   = %q{A Ruby wrapper for the Nolij Web API}
   spec.summary       = %q{Interact with Nolijweb's REST API}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/reed-college/nolij_web/"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)

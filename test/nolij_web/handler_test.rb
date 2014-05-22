@@ -111,6 +111,73 @@ describe NolijWeb::Handler do
     end
   end
 
+
+  describe '#retrieve_document_image' do
+    before do
+      @document_id = '12345'
+      @folder_id = '111_2'
+      @stubbed_request = stub_request(:get, /\/handler\/api\/docs\/#{@folder_id}\/#{@document_id}\/page\/1/).to_return(:status => 200)
+    end
+
+    it "should raise missing attribute if no document id supplied" do
+      err = lambda{@handler.retrieve_document_image(:folder_id => '1243')}.must_raise(NolijWeb::AttributeMissingError)
+      err.to_s.must_match /document ID is required/i
+    end
+
+    it "should raise missing attribute if no folder id supplied" do
+      err = lambda{@handler.retrieve_document_image(:document_id => '123')}.must_raise(NolijWeb::AttributeMissingError)
+      err.to_s.must_match /folder ID is required/i
+    end
+
+    it "should get document image" do
+      @handler.retrieve_document_image(:document_id => @document_id, :folder_id => @folder_id, :page => 1)
+      assert_requested @stubbed_request
+    end
+
+    it "should set page to 1 when no page" do
+      @handler.retrieve_document_image(:document_id => @document_id, :folder_id => @folder_id)
+      assert_requested @stubbed_request
+    end
+  end
+
+  describe "document_metadata methods" do
+    before do
+      @folder_id = '1_2'
+      @document_id = '1111'
+      response = File.new(File.join(File.expand_path(File.dirname(__FILE__)), 'test_stubs', 'document_metadata.xml'))
+      @stubbed_request = stub_request(:get, /\/handler\/api\/docs\/#{@folder_id}\/#{@document_id}\/documentmeta/).to_return(:status => 200, :body => response)
+    end
+
+    describe '#document_metadata_xml' do
+      it "should raise missing attribute if no folder id is supplied" do
+        err = lambda{@handler.document_metadata_xml(:document_id => @document_id)}.must_raise(NolijWeb::AttributeMissingError)
+        err.to_s.must_match /Folder ID is required/i
+      end
+
+      it "should raise missing attribute if no document_id is supplied" do
+        err = lambda{@handler.document_metadata_xml(:folder_id => @folder_id)}.must_raise(NolijWeb::AttributeMissingError)
+        err.to_s.must_match /document ID is required/i
+      end
+
+      it "should get stubbed url" do
+        document_metadata = @handler.document_metadata_xml(:folder_id => @folder_id, :document_id => @document_id)
+        assert_requested @stubbed_request
+      end
+
+      it "should return nokogiri xml document" do
+        document_metadata = @handler.document_metadata_xml(:folder_id => @folder_id, :document_id => @document_id)
+        document_metadata.must_be_kind_of(Nokogiri::XML::Document)
+      end
+    end
+
+    describe '#document_metadata' do
+      it "should return nokogiri a hash" do
+        document_metadata = @handler.document_metadata(:folder_id => @folder_id, :document_id => @document_id)
+        document_metadata.must_be_kind_of(Hash)
+      end
+    end
+  end
+
   describe '#viewer_url' do
     it "should raise missing attribute if no document id supplied" do
       err = lambda{@handler.viewer_url}.must_raise(NolijWeb::AttributeMissingError)

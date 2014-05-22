@@ -28,6 +28,7 @@ Be sure the close the connection when you are finished.
     attr_reader :username
     attr_reader :cookies
     attr_reader :connection
+    attr_reader :headers
 
     @@valid_config_keys = [:username, :password, :base_url]
 
