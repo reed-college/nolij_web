@@ -47,7 +47,7 @@ module NolijWeb
     # Submit a file.
     # A local file path is required.
     # required options: :folder_id
-    # additional options: :user_code, :wfma_code, :index_code, :dept_code, :custom_name, :folder_name
+    # additional options: :user_code, :wfma_code, :index_code, :dept_code, :custom_name
     def submit_document(local_file, options = {}, &block)
       folder_id = options[:folder_id]
       folder_id = if folder_id.kind_of?(Numeric) || folder_id.kind_of?(String)
