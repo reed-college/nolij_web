@@ -16,12 +16,12 @@ describe NolijWeb::Connection do
 
   #stubs connection and requests for full authenticated round trip
   def stub_connection_round_trip(connection)
-    @cookies = {'k' => 'v', 'a' => 'b'}
+    @cookies = {'a' => 'b'}
 
     @stubbed_login = stub_request(:post, "#{@base_url}/j_spring_security_check").
-with(:body => {"j_password"=> connection.instance_variable_get(:@password), "j_username"=> connection.instance_variable_get(:@username)}).to_return(:status => 200, :headers => {'Set-Cookie' => to_cookie(@cookies)})
+    with(:body => {"j_password"=> connection.instance_variable_get(:@password), "j_username"=> connection.instance_variable_get(:@username)}).to_return(:status => 200, :headers => {'Set-Cookie' => to_cookie(@cookies)}.merge(WEBMOCK_HEADERS))
 
-    @stubbed_logout = stub_request(:get, "#{@base_url}/j_spring_security_logout").with(:headers => {'Cookie' => to_cookie(@cookies)})
+    @stubbed_logout = stub_request(:get, "#{@base_url}/j_spring_security_logout").with(:headers => {'Cookie' => to_cookie(@cookies)}.merge(WEBMOCK_HEADERS))
   end
 
   describe '# initialize' do
@@ -243,7 +243,7 @@ with(:body => {"j_password"=> connection.instance_variable_get(:@password), "j_u
     before do
       setup_configured_connection
       stub_connection_round_trip(@conn)
-      @stubbed_get = stub_request(:get, "#{@base_url}/go").to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)})
+      @stubbed_get = stub_request(:get, "#{@base_url}/go").to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)}.merge(WEBMOCK_HEADERS))
     end
 
     it "should not open connection" do
@@ -266,7 +266,7 @@ with(:body => {"j_password"=> connection.instance_variable_get(:@password), "j_u
     before do
       setup_configured_connection
       stub_connection_round_trip(@conn)
-      @stubbed_get = stub_request(:get, "#{@base_url}/go").to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)})
+      @stubbed_get = stub_request(:get, "#{@base_url}/go").to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)}.merge(WEBMOCK_HEADERS))
     end
 
     it "should open connection" do
@@ -289,7 +289,7 @@ with(:body => {"j_password"=> connection.instance_variable_get(:@password), "j_u
     before do
       setup_configured_connection
       stub_connection_round_trip(@conn)
-      @stubbed_get = stub_request(:delete, "#{@base_url}/go").to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)})
+      @stubbed_get = stub_request(:delete, "#{@base_url}/go").to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)}.merge(WEBMOCK_HEADERS))
     end
 
     it "should not open connection" do
@@ -312,7 +312,7 @@ with(:body => {"j_password"=> connection.instance_variable_get(:@password), "j_u
     before do
       setup_configured_connection
       stub_connection_round_trip(@conn)
-      @stubbed_get = stub_request(:delete, "#{@base_url}/go").to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)})
+      @stubbed_get = stub_request(:delete, "#{@base_url}/go").to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)}.merge(WEBMOCK_HEADERS))
     end
 
     it "should open connection" do
@@ -336,7 +336,7 @@ with(:body => {"j_password"=> connection.instance_variable_get(:@password), "j_u
       setup_configured_connection
       stub_connection_round_trip(@conn)
       @post_params = {'a' => 'b'}
-      @stubbed_post = stub_request(:post, "#{@base_url}/go").with(:body => @post_params).to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)})
+      @stubbed_post = stub_request(:post, "#{@base_url}/go").with(:body => @post_params).to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)}.merge(WEBMOCK_HEADERS))
     end
 
     it "should not open connection" do
@@ -360,7 +360,7 @@ with(:body => {"j_password"=> connection.instance_variable_get(:@password), "j_u
       setup_configured_connection
       stub_connection_round_trip(@conn)
       @post_params = {'a' => 'b'}
-      @stubbed_post = stub_request(:post, "#{@base_url}/go").with(:body => @post_params).to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)})
+      @stubbed_post = stub_request(:post, "#{@base_url}/go").with(:body => @post_params).to_return(:status => 200, :headers => {'Cookie' => to_cookie(@cookies)}.merge(WEBMOCK_HEADERS))
     end
 
     it "should open connection" do
