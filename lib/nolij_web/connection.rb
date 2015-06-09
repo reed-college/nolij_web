@@ -16,7 +16,7 @@ Nolijweb::Connection is the class that handles actual Nolijweb api sessions and 
 ===Manual Usage
 You can manually establish a connection and use the _custom_connection methods to execute multiple requests in series.
 
-Be sure the close the connection when you are finished.
+Be sure to close the connection when you are finished.
 
   conn = NolijWeb::Connection.new(config_hash_or_yaml_path)
   conn.establish_connection
