@@ -30,7 +30,7 @@ Be sure to close the connection when you are finished.
     attr_reader :connection
     attr_reader :headers
 
-    @@valid_config_keys = [:username, :password, :base_url]
+    @@valid_config_keys = [:username, :password, :base_url, :verify_ssl]
 
     def initialize(config)
       if config.is_a?(String)
@@ -51,6 +51,7 @@ Be sure to close the connection when you are finished.
       @base_url = @config[:base_url] || ''
       @username = @config[:username] || ''
       @password = @config[:password] || ''
+      @verify_ssl = (@config[:verify_ssl].nil? || @config[:verify_ssl] === true) ? true : !((@config[:verify_ssl] === false) || (@config[:verify_ssl] =~ /^(false|f|no|n|0)$/i))
       @connection = nil
       @cookies = nil
       @headers = {}
@@ -73,7 +74,7 @@ Be sure to close the connection when you are finished.
     end
 
     def establish_connection
-      @connection = RestClient.post("#{@base_url}/j_spring_security_check", {:j_username => @username, :j_password => @password}) { |response, request, result, &block|
+      @connection = post_custom_connection("#{@base_url}/j_spring_security_check", {:j_username => @username, :j_password => @password}) { |response, request, result, &block|
         if [301, 302, 307].include? response.code
           response
         else
@@ -86,7 +87,7 @@ Be sure to close the connection when you are finished.
     end
 
     def close_connection
-      RestClient.get("#{@base_url}/j_spring_security_logout", :cookies => @cookies) if @connection
+      rest_client_wrapper(:get, "#{@base_url}/j_spring_security_logout", :cookies => @cookies) if @connection
       @connection = nil
       @cookies = nil
       @headers = {}
@@ -125,21 +126,28 @@ Be sure to close the connection when you are finished.
     def get_custom_connection(path, headers = {}, &block)
       block ||= default_response_handler
       url = URI.join(@base_url, URI.parse(@base_url).path + '/', path.to_s).to_s
-      RestClient.get(url, headers, &block)
+      rest_client_wrapper(:get, url, headers, &block)
     end
 
     # Use this inside an execute block to make mulitiple calls in the same request
     def delete_custom_connection(path, headers = {}, &block)
       block ||= default_response_handler
       url = URI.join(@base_url, URI.parse(@base_url).path + '/', path.to_s).to_s
-      RestClient.delete(url, headers, &block)
+      rest_client_wrapper(:delete, url, headers, &block)
     end
 
     # Use this inside an execute block to make mulitiple calls in the same request
     def post_custom_connection(path, payload, headers = {}, &block)
       block ||= default_response_handler
       url = URI.join(@base_url, URI.parse(@base_url).path + '/', path.to_s).to_s
-      RestClient.post(url, payload, headers, &block)
+      RestClient::Request.execute(method: :post, url: url, payload: payload, headers: headers, verify_ssl: @verify_ssl, &block)
+    end
+
+    # RestClient.get/put/delete offer no way to pass additional arguments, so 
+    # a wrapper is recommended: 
+    # https://github.com/rest-client/rest-client/issues/297
+    def rest_client_wrapper(method, url, headers={}, &block)
+      RestClient::Request.execute(method: method, url: url, headers: headers, verify_ssl: @verify_ssl, &block)
     end
 
 private

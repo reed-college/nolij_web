@@ -134,6 +134,72 @@ describe NolijWeb::Connection do
     it "should define nil cookies" do
       @conn.instance_variable_get(:@cookies).must_be_nil
     end
+
+    it "should default to verifying SSL" do
+      @conn.instance_variable_get(:@verify_ssl).must_equal true
+    end
+
+    it "should interpret boolean settings for verifying SSL" do
+      @conn.configure({:verify_ssl => true})
+      @conn.instance_variable_get(:@verify_ssl).must_equal true
+      @conn.configure({:verify_ssl => false})
+      @conn.instance_variable_get(:@verify_ssl).must_equal false
+    end
+
+    it "should interpret true|false string settings for verifying SSL" do
+      @conn.configure({:verify_ssl => 'true'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal true
+      @conn.configure({:verify_ssl => 'false'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal false
+    end
+
+    it "should use the default (true) when a weird setting is used for verifying SSL" do
+      @conn.configure({:verify_ssl => 'something weird!'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal true
+    end
+
+    it "should interpret t|f settings for verifying SSL" do
+      @conn.configure({:verify_ssl => 't'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal true
+      @conn.configure({:verify_ssl => 'f'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal false
+    end
+
+    it "should interpret yes|no settings for verifying SSL" do
+      @conn.configure({:verify_ssl => 'yes'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal true
+      @conn.configure({:verify_ssl => 'no'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal false
+    end
+
+    it "should interpret y|n settings for verifying SSL" do
+      @conn.configure({:verify_ssl => 'y'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal true
+      @conn.configure({:verify_ssl => 'n'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal false
+    end
+
+    it "should interpret 1|0 settings for verifying SSL" do
+      @conn.configure({:verify_ssl => '1'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal true
+      @conn.configure({:verify_ssl => '0'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal false
+    end
+
+    it "should interpret T|F settings for verifying SSL" do
+      @conn.configure({:verify_ssl => 'T'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal true
+      @conn.configure({:verify_ssl => 'F'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal false
+    end
+
+    it "should interpret Y|N settings for verifying SSL" do
+      @conn.configure({:verify_ssl => 'Y'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal true
+      @conn.configure({:verify_ssl => 'N'})
+      @conn.instance_variable_get(:@verify_ssl).must_equal false
+    end
+
   end
 
   describe '#configure_with' do

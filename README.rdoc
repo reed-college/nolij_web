@@ -33,7 +33,8 @@ Configuration can be passed as an assigned hash
   config = {
             :username => 'username',
             :password => 'password',
-            :base_url => 'https://somedomain.com/NolijWeb'
+            :base_url => 'https://somedomain.com/NolijWeb',
+            :verify_ssl => true # optional, defaults to true
            }
 
 Configuration can be read from a YAML file by passing the file path. The file should contain a hash structure:
@@ -41,6 +42,7 @@ Configuration can be read from a YAML file by passing the file path. The file sh
   :username: 'username'
   :password: 'password'
   :base_url: 'https://somedomain.com/NolijWeb'
+  :verify_ssl: true # optional, defaults to true
 
 == Passing a block to NolijWeb::Handler methods
 You may pass a custom block to handler methods. Please note that your block should return the response for successful request. Some of the methods rely on parsing XML responses from the server.
