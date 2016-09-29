@@ -125,21 +125,21 @@ Be sure to close the connection when you are finished.
     # Use this inside an execute block to make mulitiple calls in the same request
     def get_custom_connection(path, headers = {}, &block)
       block ||= default_response_handler
-      url = URI.join(@base_url, URI.parse(@base_url).path + '/', path.to_s).to_s
+      url = URI.join(@base_url, URI.parse(@base_url).path + '/', URI.encode(path.to_s)).to_s
       rest_client_wrapper(:get, url, headers, &block)
     end
 
     # Use this inside an execute block to make mulitiple calls in the same request
     def delete_custom_connection(path, headers = {}, &block)
       block ||= default_response_handler
-      url = URI.join(@base_url, URI.parse(@base_url).path + '/', path.to_s).to_s
+      url = URI.join(@base_url, URI.parse(@base_url).path + '/', URI.encode(path.to_s)).to_s
       rest_client_wrapper(:delete, url, headers, &block)
     end
 
     # Use this inside an execute block to make mulitiple calls in the same request
     def post_custom_connection(path, payload, headers = {}, &block)
       block ||= default_response_handler
-      url = URI.join(@base_url, URI.parse(@base_url).path + '/', path.to_s).to_s
+      url = URI.join(@base_url, URI.parse(@base_url).path + '/', URI.encode(path.to_s)).to_s
       RestClient::Request.execute(method: :post, url: url, payload: payload, headers: headers, verify_ssl: @verify_ssl, &block)
     end
 
