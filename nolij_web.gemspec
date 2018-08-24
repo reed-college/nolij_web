@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.extra_rdoc_files  = spec.files.select { |p| p =~ /^README/ } << 'LICENSE.txt'
   spec.rdoc_options      = %w[--line-numbers --inline-source --main README.rdoc]
 
-  spec.add_runtime_dependency 'rest-client', '~> 1.6'
+  spec.add_runtime_dependency 'rest-client'
   spec.add_runtime_dependency 'nokogiri', '~> 1.6'
 
   spec.add_development_dependency 'minitest', '~> 5.0.0'
