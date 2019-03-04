@@ -61,7 +61,7 @@ Be sure to close the connection when you are finished.
     def configure_with(path_to_yaml_file)
       raise ConnectionConfigurationError, "Invalid request. #configure_with requires string" unless path_to_yaml_file.is_a?(String)
       begin
-        @config = YAML::load(IO.read(path_to_yaml_file))
+        @config = YAML::load(ERB.new(IO.read(path_to_yaml_file)).result)
       rescue Errno::ENOENT
         raise ConnectionConfigurationError, "YAML configuration file was not found."
         return
